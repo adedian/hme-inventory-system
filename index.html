@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistem Peminjaman HME</title>
+<link rel="icon" href="https://hexamultienergi.com/wp-content/uploads/2022/09/cropped-cropped-cropped-cropped-Picsart_22-09-30_11-01-38-827-1.png" type="image/png">
+<link rel="apple-touch-icon" href="https://hexamultienergi.com/wp-content/uploads/2022/09/cropped-cropped-cropped-cropped-Picsart_22-09-30_11-01-38-827-1.png">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#f4f7f9;min-height:100vh;color:#2d3748;line-height:1.5}
+.screen{display:none}.screen.active{display:block}
+.login-wrap{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:1rem}
+.login-card{background:#fff;border-radius:16px;padding:2.5rem 2rem;width:100%;max-width:400px;box-shadow:0 10px 25px rgba(0,0,0,.05);border:1px solid #e2e8f0}
+.login-logo{text-align:center;margin-bottom:1.5rem}
+.login-title{font-size:22px;font-weight:700;color:#010031;margin-bottom:6px;text-align:center}
+.login-sub{font-size:14px;color:#718096;margin-bottom:1.5rem;text-align:center}
+.tab-row{display:flex;background:#edf2f7;border-radius:10px;padding:4px;margin-bottom:1.5rem}
+.tab-btn{flex:1;padding:10px;font-size:13px;font-weight:600;background:transparent;border:none;border-radius:8px;cursor:pointer;color:#4a5568}
+.tab-btn.active{background:#fff;color:#104772;box-shadow:0 2px 4px rgba(0,0,0,0.05)}
+.field{margin-bottom:1.2rem}
+.field label{display:block;font-size:12px;color:#4a5568;margin-bottom:6px;font-weight:600;text-transform:uppercase}
+.field input,.field select,.field textarea{width:100%;padding:12px 14px;border:1px solid #cbd5e0;border-radius:10px;font-size:14px;background:#f8fafc;outline:none}
+.field input:focus,.field select:focus{border-color:#104772;background:#fff}
+.field textarea{min-height:90px;resize:vertical}
+.row-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.btn-primary{width:100%;padding:12px;background:#104772;color:#fff;border:none;border-radius:10px;font-weight:600;cursor:pointer; transition:all 0.2s}
+.btn-primary:disabled{background:#a0aec0;cursor:not-allowed}
+.header{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;background:#fff;border-bottom:1px solid #e2e8f0;position:sticky;top:0;z-index:10}
+.header-left{display:flex;align-items:center;gap:12px}
+.header-title{font-size:16px;font-weight:700;color:#010031}
+.avatar{width:34px;height:34px;border-radius:50%;background:#ebf8f6;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#02745B}
+.avatar-adm{background:#fef3e2;color:#dd6b20}
+.logout-btn{font-size:13px;color:#718096;background:#f7fafc;border:1px solid #e2e8f0;padding:6px 12px;border-radius:8px;cursor:pointer}
+.nav-tabs{display:flex;background:#fff;border-bottom:1px solid #e2e8f0;padding:0 24px;overflow-x:auto}
+.nav-tab{padding:14px 16px;font-size:13px;font-weight:600;color:#718096;cursor:pointer;border-bottom:3px solid transparent;background:none;white-space:nowrap;border:none}
+.nav-tab.active{color:#104772;border-bottom-color:#104772}
+.content{padding:24px;max-width:840px;margin:0 auto;display:flex;flex-direction:column;min-height:calc(100vh - 140px)}
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px}
+.stat-card{background:#fff;border-radius:14px;padding:20px;border:1px solid #e2e8f0}
+.stat-label{font-size:11px;color:#718096;text-transform:uppercase;font-weight:600}
+.stat-val{font-size:24px;font-weight:800}
+.blue{color:#104772}.amber{color:#dd6b20}.green{color:#02745B}
+.history-card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:16px 20px;margin-bottom:10px;border-left:5px solid #cbd5e0}
+.history-card.active-loan{border-left-color:#104772}
+.badge{font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px}
+.badge-pending{background:#feebc8;color:#c05621}
+.badge-approved{background:#e6f4f1;color:#02745B}
+.badge-returned{background:#edf2f7;color:#4a5568}
+.badge-rejected{background:#fed7d7;color:#c53030}
+.form-card{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:2rem;margin-bottom:16px}
+.item-img-preview{width:100%;height:150px;object-fit:contain;background:#f8fafc;border-radius:12px;margin-bottom:15px;border:1px dashed #cbd5e0}
+.inventory-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(160px, 1fr));gap:15px}
+.inv-card{background:#fff;border-radius:12px;border:1px solid #e2e8f0;padding:12px;text-align:center;position:relative}
+.inv-card img{width:100%;height:100px;object-fit:cover;border-radius:8px;margin-bottom:8px}
+.inv-card b{font-size:13px;display:block}
+.inv-card span{font-size:11px;color:#718096}
+.st-label {font-size:10px; font-weight:800; padding:2px 6px; border-radius:4px; margin-top:5px; display:inline-block}
+.st-tersedia {background:#e6f4f1; color:#02745B}
+.st-dipinjam {background:#fed7d7; color:#c53030}
+.watermark,.app-watermark{text-align:center;font-size:11px;color:#a0aec0;margin-top:20px}
+.empty{text-align:center;padding:40px;color:#a0aec0}
+.alert-box{background:#fffaf0;border:1px solid #fbd38d;padding:15px;border-radius:12px;color:#dd6b20;font-size:14px;margin-bottom:20px}
+.alert-info{background:#ebf8f6;border:1px solid #bce4dc;border-radius:12px;padding:15px;font-size:14px;color:#02745B;margin-bottom:20px;}
+@media(max-width:600px){.stats-row{grid-template-columns:1fr; gap: 10px;}.row-2{grid-template-columns:1fr; gap: 0;}.content{padding:16px}.form-card{padding: 1.5rem;}}
+</style>
+</head>
+<body>
+
+<div id="screen-login" class="screen active">
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="login-logo">
+        <img src="https://hexamultienergi.com/wp-content/uploads/2022/09/cropped-cropped-cropped-cropped-Picsart_22-09-30_11-01-38-827-1.png" alt="Logo HME" style="max-width: 140px; height: auto; margin-bottom: 16px;">
+      </div>
+      <div class="login-title">Sistem Peminjaman</div>
+      <div class="login-sub">PT Hexa Multi Energi</div>
+      <div class="tab-row">
+        <button class="tab-btn active" onclick="setRole('staff')">👷 Staff</button>
+        <button class="tab-btn" onclick="setRole('admin')">🔑 Admin</button>
+      </div>
+      <div class="field"><label>Username</label><input type="text" id="lu" placeholder="username" autocomplete="off"></div>
+      <div class="field"><label>Password</label><input type="password" id="lp" placeholder="password" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <div id="lerr" style="color:red;font-size:12px;margin-bottom:10px;text-align:center"></div>
+      <button class="btn-primary" id="btn-masuk" onclick="doLogin()" disabled>Menghubungkan Database...</button>
+      <div class="hint" style="font-size:11px; color:#a0aec0; text-align:center; margin-top:15px">Hubungi Admin jika belum memiliki akses</div>
+      <div class="watermark">© PT. HEXA MULTI ENERGI. All rights reserved.<br>Designed by Ade Dian Sukmana</div>
+    </div>
+  </div>
+</div>
+
+<div id="app-content" class="screen">
+  <div class="header">
+    <div class="header-left">
+      <img src="https://hexamultienergi.com/wp-content/uploads/2022/09/cropped-cropped-cropped-cropped-Picsart_22-09-30_11-01-38-827-1.png" style="height:32px; margin-right:8px;">
+      <div class="header-title">Peminjaman Barang</div>
+    </div>
+    <div class="header-right">
+      <div class="avatar" id="app-av"></div>
+      <button class="logout-btn" onclick="location.reload()">Keluar</button>
+    </div>
+  </div>
+
+  <div class="nav-tabs" id="nav-container"></div>
+
+  <div class="content">
+    <div id="sync-status" style="font-size:10px;text-align:right;color:#a0aec0; margin-bottom:5px">🔄 Menghubungkan...</div>
+    <div id="view-container"></div>
+    <div class="app-watermark">© PT. HEXA MULTI ENERGI. All rights reserved. Designed by Ade Dian Sukmana</div>
+  </div>
+</div>
+
+<script>
+var USERS = {}, INV = [], CART = []; 
+var S = { loans:[], user:null, loginRole:'staff', currentTab:0 };
+
+window.onload = function() {
+  google.script.run.withSuccessHandler(res => { 
+    try {
+      USERS = JSON.parse(res); 
+      document.getElementById('btn-masuk').disabled = false; 
+      document.getElementById('btn-masuk').textContent = "Masuk ke Sistem";
+    } catch(e) {}
+  }).getAllUsers();
+  
+  google.script.run.withSuccessHandler(res => { 
+    try { INV = JSON.parse(res); } catch(e) {}
+  }).getInventory();
+};
+
+function fetchSync() {
+  if(!S.user) return;
+  google.script.run.withSuccessHandler(d => { 
+    S.loans = d; 
+    var isTyping = (S.currentTab === 1 || S.currentTab === 3);
+    if(S.user.role === 'admin' && S.currentTab > 1) isTyping = true;
+    if(!isTyping) renderCurrentView(); 
+    document.getElementById('sync-status').textContent = "✅ Terhubung: " + new Date().toLocaleTimeString(); 
+  }).getLoans();
+  
+  google.script.run.withSuccessHandler(res => { try { INV = JSON.parse(res); } catch(e) {} }).getInventory();
+}
+setInterval(fetchSync, 10000);
+
+function setRole(r){ S.loginRole = r; document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.textContent.toLowerCase().includes(r))); }
+function doLogin(){
+  var u = document.getElementById('lu').value.trim().toLowerCase(), p = document.getElementById('lp').value, usr = USERS[u];
+  if(!usr || usr.pass !== p || usr.role !== S.loginRole){ document.getElementById('lerr').textContent = 'Login Gagal! Cek Username, Password, atau Role.'; return; }
+  S.user = Object.assign({}, usr, {username:u});
+  document.getElementById('screen-login').classList.remove('active');
+  document.getElementById('app-content').classList.add('active');
+  document.getElementById('app-av').textContent = S.user.label;
+  if(S.user.role === 'admin') document.getElementById('app-av').classList.add('avatar-adm');
+  setupNav(); changeTab(0); fetchSync();
+}
+
+function setupNav(){
+  var n = document.getElementById('nav-container');
+  if(S.user.role === 'staff'){
+    n.innerHTML = `
+      <button class="nav-tab active" onclick="changeTab(0,this)">📋 Riwayat</button>
+      <button class="nav-tab" onclick="changeTab(1,this)">➕ Pinjam Baru</button>
+      <button class="nav-tab" onclick="changeTab(2,this)">↩️ Kembali</button>
+      <button class="nav-tab" onclick="changeTab(3,this)">🔒 Seting</button>`;
+  } else {
+    n.innerHTML = `
+      <button class="nav-tab active" onclick="changeTab(0,this)">📋 Permohonan</button>
+      <button class="nav-tab" onclick="changeTab(1,this)">🗂️ Riwayat</button>
+      <button class="nav-tab" onclick="changeTab(2,this)">📊 Rekap Data</button>
+      <button class="nav-tab" onclick="changeTab(3,this)">📦 Master Barang</button>
+      <button class="nav-tab" onclick="changeTab(4,this)">👥 Manajemen Staff</button>`;
+  }
+}
+
+function changeTab(i, b){ S.currentTab = i; CART = []; if(b){ document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active')); b.classList.add('active'); } renderCurrentView(); }
+
+function renderCurrentView(){
+  var c = document.getElementById('view-container');
+  if(S.user.role === 'staff'){
+    if(S.currentTab === 0) renderStaffRiwayat(c);
+    if(S.currentTab === 1) renderStaffForm(c);
+    if(S.currentTab === 2) renderStaffReturn(c);
+    if(S.currentTab === 3) renderSetting(c);
+  } else {
+    if(S.currentTab === 0) renderAdminPanel(c);
+    if(S.currentTab === 1) renderAdminRiwayat(c); 
+    if(S.currentTab === 2) renderAdminRecap(c);
+    if(S.currentTab === 3) renderAdminInventory(c);
+    if(S.currentTab === 4) renderUserPanel(c);
+  }
+}
+
+// ================= VIEW STAFF =================
+function renderStaffRiwayat(con){
+  var ml = S.loans.filter(l => l.user === S.user.username);
+  con.innerHTML = `
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-label">Aktif</div><div class="stat-val blue">${ml.filter(x=>x.status=='approved').length}</div></div>
+      <div class="stat-card"><div class="stat-label">Pending</div><div class="stat-val amber">${ml.filter(x=>x.status=='pending').length}</div></div>
+      <div class="stat-card"><div class="stat-label">Selesai</div><div class="stat-val green">${ml.filter(x=>x.status=='returned').length}</div></div>
+    </div>` + 
+  (ml.length ? ml.map(l => cardHTML(l, false)).join('') : '<div class="empty">Belum ada riwayat peminjaman.</div>');
+}
+
+function renderStaffForm(con){
+  if(S.loans.some(l => l.user === S.user.username && l.status === 'approved')){ 
+    con.innerHTML = `<div class="alert-box">⚠️ <b>Akses Terbatas:</b> Kamu masih memiliki barang aktif. Kembalikan dulu barang sebelumnya ke gudang sebelum mengajukan peminjaman baru.</div>`; 
+    return; 
+  }
+  var today = new Date().toISOString().split('T')[0];
+  var availableItems = INV.filter(item => item.status_master === "Tersedia");
+
+  con.innerHTML = `
+    <div class="form-card" id="form-pinjam">
+      <h3>📝 Form Pengajuan Pinjam</h3>
+      <div class="alert-info" style="padding:10px; font-size:12px; margin-bottom:15px">
+        💡 <b>Tips:</b> Anda bisa meminjam lebih dari 1 barang. Pilih barang lalu klik "Tambah".
+      </div>
+      <div class="field"><label>Pilih Alat / Barang *</label>
+        <div style="display:flex; gap:8px">
+          <select id="f-id-barang" onchange="updatePreviewImg(this.value)" style="flex:1">
+            <option value="">-- Cari Nama Alat --</option>
+            ${availableItems.map(i=>`<option value="${i.id}">${i.nama} (${i.id})</option>`).join('')}
+          </select>
+          <button class="btn-primary" style="width:auto; background:#02745B; padding:10px 15px;" onclick="addToCart()">➕ Tambah</button>
+        </div>
+      </div>
+      <div id="cart-container" style="margin-bottom:15px"></div>
+      <img id="img-preview" class="item-img-preview" src="https://via.placeholder.com/150?text=Preview+Barang">
+      <div class="row-2">
+        <div class="field"><label>Tanggal Pinjam *</label><input type="date" id="f-tgl" value="${today}"></div>
+        <div class="field"><label>Tim Yang Ikut</label><input type="text" id="f-tim" placeholder=""></div>
+      </div>
+      <div class="field"><label>Lokasi Tujuan *</label><input type="text" id="f-lokasi" placeholder=""></div>
+      <div class="field"><label>Keterangan Tambahan</label><textarea id="f-ket" placeholder="Informasi mengenai peruntukan alat"></textarea></div>
+      <button class="btn-primary" id="btn-submit-loan" onclick="submitLoan()">📤 Ajukan Peminjaman</button>
+    </div>`;
+  renderCartUI();
+}
+
+function updatePreviewImg(id){ var item = INV.find(x => x.id == id); document.getElementById('img-preview').src = (item && item.foto) ? item.foto : "https://via.placeholder.com/150?text=No+Image"; }
+function addToCart() { var idB = document.getElementById('f-id-barang').value; if(!idB) return alert('Pilih alat dulu!'); if(CART.some(x => x.id === idB)) return alert('Sudah ditambahkan!'); CART.push(INV.find(x => x.id === idB)); document.getElementById('f-id-barang').value = ""; updatePreviewImg(""); renderCartUI(); }
+function removeFromCart(idB) { CART = CART.filter(x => x.id !== idB); renderCartUI(); }
+function renderCartUI() { var c = document.getElementById('cart-container'); if(CART.length === 0) { c.innerHTML = ""; return; } var html = `<div style="font-size:12px; font-weight:700; color:#4a5568; margin-bottom:8px;">🛒 Daftar Pinjaman (${CART.length} Alat):</div>`; CART.forEach(i => { html += `<div style="background:#f8fafc; padding:10px 14px; border-radius:8px; border:1px solid #cbd5e0; display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;"><div style="font-size:13px; color:#010031"><b>${i.nama}</b> <span style="color:#718096;font-size:11px">(${i.id})</span></div><button style="background:#fed7d7; border:none; color:#c53030; cursor:pointer; font-weight:bold; width:24px; height:24px; border-radius:4px; display:flex; justify-content:center; align-items:center" onclick="removeFromCart('${i.id}')">X</button></div>`; }); c.innerHTML = html; }
+
+function submitLoan(){
+  if(CART.length === 0) return alert('Daftar pinjaman kosong!');
+  var lok = document.getElementById('f-lokasi').value; if(!lok) return alert('Lokasi wajib diisi!');
+  var btn = document.getElementById('btn-submit-loan'); btn.disabled = true; btn.textContent = "⏳ Memproses...";
+  var now = new Date(); var tglFinal = document.getElementById('f-tgl').value.split('-').reverse().join('/') + ' ' + ("0" + now.getHours()).slice(-2) + "." + ("0" + now.getMinutes()).slice(-2);
+  var dataArray = CART.map((item, index) => ({ id: "HME-"+Date.now()+"-"+index, username: S.user.username, namaAlat: item.nama, idBarang: item.id, namaPembawa: S.user.name, tanggalDibawa: tglFinal, tim: document.getElementById('f-tim').value.trim(), lokasi: lok.trim(), keterangan: document.getElementById('f-ket').value.trim(), status: 'pending' }));
+  google.script.run.withSuccessHandler(()=>{ alert('✅ Berhasil diajukan!'); CART = []; changeTab(0); fetchSync(); }).withFailureHandler((err)=>{ alert('Error: ' + err); btn.disabled = false; btn.textContent = "📤 Ajukan Peminjaman"; }).saveMultipleLoans(dataArray); 
+}
+
+function renderStaffReturn(con){
+  var active = S.loans.filter(l => l.user === S.user.username && l.status === 'approved');
+  if(active.length === 0){ con.innerHTML = `<div class="alert-info">ℹ️ Anda tidak memiliki barang yang aktif dipinjam.</div>`; return; }
+  con.innerHTML = `<div class="alert-info">Pilih barang yang sudah Anda kembalikan secara fisik ke gudang HME.</div>` + active.map(l => cardHTML(l, false)).join('');
+}
+
+// ================= VIEW ADMIN =================
+function renderAdminPanel(con){ 
+  var p = S.loans.filter(x=>x.status=='pending');
+  con.innerHTML = `
+    <div class="stats-row" style="margin-bottom:15px">
+      <div class="stat-card"><div class="stat-label">Perlu Review</div><div class="stat-val amber">${p.length}</div></div>
+      <div class="stat-card"><div class="stat-label">Aktif (Gudang Kosong)</div><div class="stat-val blue">${S.loans.filter(x=>x.status=='approved').length}</div></div>
+      <div class="stat-card"><div class="stat-label">Total Selesai</div><div class="stat-val green">${S.loans.filter(x=>x.status=='returned').length}</div></div>
+    </div>
+    <div style="font-size:16px; font-weight:700; color:#010031; margin-bottom:15px">📋 Permohonan Masuk Baru</div>` + 
+  (p.length ? p.map(l=>cardHTML(l,true)).join('') : '<div class="empty">Tidak ada permohonan peminjaman.</div>'); 
+}
+
+function renderAdminRiwayat(con){
+  var riwayatData = S.loans.filter(x => x.status !== 'pending');
+  con.innerHTML = `
+    <div class="stats-row" style="margin-bottom:15px">
+      <div class="stat-card"><div class="stat-label">Total Transaksi</div><div class="stat-val blue">${riwayatData.length}</div></div>
+      <div class="stat-card"><div class="stat-label">Sedang Dipinjam</div><div class="stat-val amber">${riwayatData.filter(x=>x.status=='approved').length}</div></div>
+      <div class="stat-card"><div class="stat-label">Sudah Selesai</div><div class="stat-val green">${riwayatData.filter(x=>x.status=='returned').length}</div></div>
+    </div>
+    <div style="font-size:16px; font-weight:700; color:#010031; margin-bottom:15px">🗂️ Riwayat Seluruh Transaksi</div>` + 
+  (riwayatData.length ? riwayatData.map(l=>cardHTML(l,true)).join('') : '<div class="empty">Belum ada riwayat transaksi.</div>'); 
+}
+
+function renderAdminInventory(con){
+  con.innerHTML = `
+    <div class="form-card">
+      <h3>📦 Tambah Master Barang Baru</h3>
+      <div class="row-2">
+        <div class="field"><label>ID Barang Unik</label><input id="inv-id" placeholder="Cth: HME-TOOL-01"></div>
+        <div class="field"><label>Nama Alat Lengkap</label><input id="inv-nama" placeholder="Cth: Drone DJI 4K"></div>
+      </div>
+      <div class="field"><label>URL Link Foto (Opsional)</label><input id="inv-foto" placeholder="https://lh3.googleusercontent.com/d/(ID GAMBAR)"></div>
+      <div class="field"><label>Kategori</label>
+        <select id="inv-kat">
+          <option>Alat Ukur</option><option>Alat Berat</option><option>Drone</option><option>Toolkit</option><option>Solar Panel</option><option>Lain-lain</option>
+        </select>
+      </div>
+      <button class="btn-primary" onclick="addInventory()">💾 Simpan ke Database</button>
+    </div>
+    
+    <div style="font-size:16px; font-weight:700; color:#010031; margin:20px 0 10px 0">Daftar Inventaris HME</div>
+    <div class="inventory-grid">
+      ${INV.map(i=>`
+        <div class="inv-card">
+          <img src="${i.foto || 'https://via.placeholder.com/150'}">
+          <b>${i.nama}</b>
+          <span>ID: ${i.id}</span>
+          <div style="margin-top: 6px;">
+            <span class="st-label ${i.status_master === 'Dipinjam' ? 'st-dipinjam' : 'st-tersedia'}">
+               ${i.status_master || 'Tersedia'}
+            </span>
+          </div>
+          <button style="color:#c53030;border:none;background:none;font-size:11px;font-weight:600;cursor:pointer;margin-top:8px" onclick="delInventory('${i.id}')">[ Hapus ]</button>
+        </div>
+      `).join('')}
+    </div>`;
+}
+
+function addInventory(){
+  var d = { id: document.getElementById('inv-id').value.trim(), nama: document.getElementById('inv-nama').value.trim(), foto: document.getElementById('inv-foto').value.trim(), kategori: document.getElementById('inv-kat').value };
+  if(!d.id || !d.nama) return alert('ID dan Nama Barang wajib diisi!');
+  google.script.run.withSuccessHandler(()=>{ google.script.run.withSuccessHandler(r=>{ INV=JSON.parse(r); renderCurrentView(); }).getInventory(); }).dbAddInventory(d);
+}
+
+function delInventory(id){ if(confirm('Yakin ingin menghapus barang '+id+'?')) { google.script.run.withSuccessHandler(()=>{ google.script.run.withSuccessHandler(r=>{ INV=JSON.parse(r); renderCurrentView(); }).getInventory(); }).dbDeleteInventory(id); } }
+
+// ================= FUNGSI REKAP BESERTA TIMER & TOP ITEMS =================
+function renderAdminRecap(con){
+  var months = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+  var now = new Date();
+  con.innerHTML = `
+    <div class="form-card">
+      <h3>📊 Rekap Bulanan Inventaris</h3>
+      <div class="row-2">
+        <div class="field"><label>Pilih Bulan</label><select id="r-m">${months.map((m,i)=>`<option value="${i+1}" ${i==now.getMonth()?'selected':''}>${m}</option>`).join('')}</select></div>
+        <div class="field"><label>Pilih Tahun</label><input id="r-y" type="number" value="${now.getFullYear()}"></div>
+      </div>
+      <button class="btn-primary" onclick="loadRecap()" style="margin-bottom:15px">🔄 Tampilkan Statistik</button>
+      
+      <button class="btn-primary" onclick="downloadExcel()" style="background:#02745B; display:flex; justify-content:center; align-items:center; gap:8px">
+        📥 Download Laporan Excel (XLSX)
+      </button>
+      
+      <div id="recap-res" style="margin-top:20px"></div>
+    </div>`;
+}
+
+function loadRecap(){
+  var m = document.getElementById('r-m').value, y = document.getElementById('r-y').value;
+  document.getElementById('recap-res').innerHTML = "<p style='text-align:center; padding:20px; color:#718096'>⏳ Menghitung data dari server...</p>";
+  
+  google.script.run.withSuccessHandler(s => {
+    if(s.total === 0) { document.getElementById('recap-res').innerHTML = "<div class='empty'>Tidak ada data transaksi peminjaman di bulan ini.</div>"; return; }
+    
+    var sortItems = Object.keys(s.topItems).map(k => [k, s.topItems[k]]).sort((a,b)=>b[1]-a[1]);
+    document.getElementById('recap-res').innerHTML = `
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-label">Total Transaksi</div><div class="stat-val blue">${s.total}</div></div>
+        <div class="stat-card"><div class="stat-label">Telah Selesai</div><div class="stat-val green">${s.returned}</div></div>
+        <div class="stat-card"><div class="stat-label">Sedang Aktif</div><div class="stat-val amber">${s.approved}</div></div>
+      </div>
+      <div style="font-size:14px; font-weight:700; color:#010031; margin-top:10px">🔥 Alat Paling Sering Dipinjam</div>
+      <div style="margin-top:10px">
+        ${sortItems.map(i=>`<div style="font-size:13px;padding:10px;border-radius:8px; background:#f8fafc; border:1px solid #e2e8f0; margin-bottom:8px; display:flex; justify-content:space-between"><span>${i[0]}</span><b style="color:#c05621">${i[1]}x dipinjam</b></div>`).join('')}
+      </div>`;
+      
+    if(window.recapTimer) clearTimeout(window.recapTimer);
+    window.recapTimer = setTimeout(function() {
+        var resDiv = document.getElementById('recap-res');
+        if(resDiv) {
+            resDiv.innerHTML = "<p style='text-align:center; padding:20px; color:#718096'>Sesi tampilan telah habis (10 Menit).<br>Klik tombol <b>Tampilkan Statistik</b> untuk melihat data kembali.</p>";
+        }
+    }, 600000); 
+
+  }).getMonthlyStats(m, y);
+}
+
+function downloadExcel(){
+  var m = document.getElementById('r-m').value, y = document.getElementById('r-y').value;
+  var bulanStr = document.getElementById('r-m').options[document.getElementById('r-m').selectedIndex].text;
+  alert('⏳ Memproses file Excel untuk '+bulanStr+' '+y+'. Mohon tunggu, file otomatis terbuka di tab baru.');
+  google.script.run.withSuccessHandler(url => { window.open(url, '_blank'); }).withFailureHandler(err => { alert("Gagal: " + err); }).generateExcelReport(m, y);
+}
+
+function renderUserPanel(con){
+  var staffList = Object.keys(USERS).filter(k => USERS[k].role === 'staff');
+  con.innerHTML = `
+    <div class="form-card">
+      <h3>👥 Daftar Staff (Database)</h3>
+      <div style="display:grid;gap:10px;margin-bottom:20px">
+        ${staffList.map(k => `
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#f8fafc;border-radius:12px;border:1px solid #e2e8f0">
+            <div style="display:flex;align-items:center;gap:12px">
+              <div class="avatar">${USERS[k].label}</div>
+              <div><div style="font-size:14px;font-weight:700">${USERS[k].name}</div><div style="font-size:12px;color:#718096">@${k} · Staff</div></div>
+            </div>
+            <button style="background:#fed7d7;color:#c53030;border:none;padding:5px 10px;border-radius:5px;cursor:pointer;font-weight:600;font-size:11px" onclick="removeUser('${k}')">Hapus</button>
+          </div>
+        `).join('')}
+      </div>
+      <hr style="border:none;border-top:1px solid #e2e8f0;margin:20px 0">
+      <h3 style="font-size:16px">➕ Tambah Staff Baru</h3>
+      <div class="row-2" style="margin-top:10px">
+        <div class="field"><label>Username</label><input type="text" id="n-user" placeholder="Cth: ryan"></div>
+        <div class="field"><label>Nama Lengkap</label><input type="text" id="n-name" placeholder="Nama Asli"></div>
+      </div>
+      <div class="field"><label>Password Awal</label><input type="password" id="n-pwd" placeholder="Minimal 4 huruf"></div>
+      <button class="btn-primary" onclick="addUser()">Daftarkan Staff ke Database</button>
+    </div>`;
+}
+
+function addUser(){
+  var u = document.getElementById('n-user').value.trim().toLowerCase(), n = document.getElementById('n-name').value.trim(), p = document.getElementById('n-pwd').value;
+  if(!u||!n||!p) { alert('Isi semua kolom!'); return; }
+  if(USERS[u]) { alert('Username sudah dipakai!'); return; }
+  var lbl = n.split(' ').map(w => w[0]).join('').substring(0,2).toUpperCase();
+  var newData = { username: u, pass: p, role: 'staff', name: n, label: lbl };
+  USERS[u] = newData;
+  renderCurrentView();
+  google.script.run.withSuccessHandler(()=>alert('Staff ditambahkan!')).dbAddUser(newData);
+}
+
+function removeUser(u){
+  if(S.loans.some(l => l.user === u && l.status === 'approved')) return alert('Gagal! Staff ini masih memiliki barang aktif.');
+  if(confirm('Hapus akun staff '+u+' secara permanen?')){ delete USERS[u]; renderCurrentView(); google.script.run.dbDeleteUser(u); }
+}
+
+function renderSetting(c){ 
+  c.innerHTML = `
+    <div class="form-card">
+      <h3>🔒 Keamanan Akun</h3>
+      <div class="field"><label>Password Lama</label><input type="password" id="p-old" placeholder="Masukkan password saat ini"></div>
+      <div class="field"><label>Password Baru</label><input type="password" id="p-new" placeholder="Minimal 4 karakter"></div>
+      <div class="field"><label>Konfirmasi Password Baru</label><input type="password" id="p-conf" placeholder="Ketik ulang password baru"></div>
+      <button class="btn-primary" onclick="changePwd()">Simpan Perubahan</button>
+    </div>`; 
+}
+
+function changePwd(){
+  var o = document.getElementById('p-old').value, n = document.getElementById('p-new').value, c = document.getElementById('p-conf').value;
+  if(USERS[S.user.username].pass !== o) return alert('Password lama salah!');
+  if(n.length < 4) return alert('Password baru minimal 4 karakter!');
+  if(n !== c) return alert('Konfirmasi tidak cocok!');
+  USERS[S.user.username].pass = n; S.user.pass = n;
+  google.script.run.withSuccessHandler(()=>{ alert('✅ Password berhasil diubah!'); document.getElementById('p-old').value=''; document.getElementById('p-new').value=''; document.getElementById('p-conf').value=''; }).dbChangePwd(S.user.username, n);
+}
+
+// ================= SHARED ELEMENTS =================
+function cardHTML(l, isAdmin){
+  var bl={pending:'badge-pending',approved:'badge-approved',returned:'badge-returned',rejected:'badge-rejected'}, 
+      lb={pending:'Menunggu',approved:'Aktif',returned:'Selesai',rejected:'Ditolak'};
+  
+  var actionBtn = '';
+  if(isAdmin && l.status=='pending') {
+    actionBtn = `
+      <div style="margin-top:12px; display:flex; gap:8px">
+        <button style="flex:1; background:#e6f4f1;color:#02745B;border:1px solid #bce4dc;padding:8px;border-radius:8px;cursor:pointer;font-weight:600" onclick="admAct('${l.id}','approved')">✅ Setujui</button>
+        <button style="flex:1; background:#fed7d7;color:#c53030;border:1px solid #feb2b2;padding:8px;border-radius:8px;cursor:pointer;font-weight:600" onclick="admAct('${l.id}','rejected')">❌ Tolak</button>
+      </div>`;
+  }
+  
+  // HANYA MUNCUL DI TAB KEMBALI (Tab 2) JIKA BUKAN ADMIN
+  if(!isAdmin && l.status=='approved' && S.currentTab === 2) {
+    actionBtn = `<button style="margin-top:12px;width:100%;padding:10px;background:#feebc8;color:#c05621;border:none;border-radius:8px;cursor:pointer;font-weight:600" onclick="doRet('${l.id}')">↩️ Konfirmasi Kembali ke Gudang</button>`;
+  }
+
+  return `
+    <div class="history-card ${l.status=='approved'?'active-loan':''}">
+      <div style="display:flex;justify-content:space-between; align-items:flex-start">
+        <div style="width:75%">
+          <b style="font-size:15px; color:#010031">#${l.no} - ${l.item}</b>
+          <div style="font-size:12px;color:#4a5568; margin-top:6px; line-height:1.6">
+            <b>ID Alat:</b> ${l.idBarang}<br>
+            <b>Peminjam:</b> ${l.namaPembawa} (@${l.user})<br>
+            <b>Tgl Pinjam:</b> ${l.tglBawa}<br>
+            <b>Tgl Kembali:</b> ${l.tglKembali || '<span style="color:#a0aec0;font-style:italic">Belum kembali</span>'}<br>
+            <b>Lokasi Tujuan:</b> ${l.lokasi} | <b>Tim:</b> ${l.tim || '-'}<br>
+            ${l.ket ? `<span style="display:inline-block; margin-top:4px; padding:4px 8px; background:#edf2f7; border-radius:4px; font-size:11px"><b>Ket:</b> ${l.ket}</span>` : ''}
+          </div>
+        </div>
+        <span class="badge ${bl[l.status]}">${lb[l.status]}</span>
+      </div>
+      ${actionBtn}
+    </div>`;
+}
+
+function admAct(id, s){ 
+  if(confirm(s === 'approved' ? 'Setujui permohonan ini?' : 'Tolak permohonan ini?')) {
+    google.script.run.withSuccessHandler(fetchSync).saveLoan({id:id, status:s}); 
+  }
+}
+function doRet(id){ 
+  if(confirm('PENTING: Apakah Anda yakin fisik barang sudah ditaruh kembali ke gudang?')) {
+    google.script.run.withSuccessHandler(fetchSync).saveLoan({id:id, status:'returned'}); 
+  }
+}
+
+</script>
+</body>
+</html>
